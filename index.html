@@ -1,13 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WeatherSphere</title>
-  </head>
-  <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-    <h1 class="text-5xl font-bold text-blue-400">WeatherSphere esta listo</h1>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeatherSphere: Tu clima</title>
+</head>
+<!-- Fondo oscuro de la app, text claro, altura minima de pantalla -->
+
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen font-sans text-gray-100 p-4">
+  <!--Contenedor principal de la tarjeta del clima-->
+  <div class="bg-gray-800 rounded-3xl shadow-2xl w-full max-w-5xl p-6 md:p-8 flex flex-col gap-6">
+    <!--Seccion superior: Busqueda y titulo de la app-->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-blue-400">
+        WeatherSphere
+      </h1>
+      <input type="text" placeholder="Buscar ciudad..." id="search-input"
+        class="flex-1 max-w-md rounded-xl bg-gray-700 border border-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+    </div>
+
+    <!--Contenedor principal de datos del clima (clima actiual, otras ciudades, pronostico) -->
+    <div class="lg:col-span-2 bg-gray-700 rounded-2xl p-6 shadow-lg flex flex-col">
+      <!--Columna izquierda: Clima actual y mensajes-->
+      <div id="current-weather-display" class="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+        <!-- Aqui se mostrara el clima actual-->
+        <p class="text-center text-gray-400">Cargando datos del clima...</p>
+      </div>
+      <div id="message-area" class="text-center text-lg text-red-400 hidden mt-4">
+        <!-- Aqui se mostrara mensajes de error o advertencia -->
+      </div>
+    </div>
+    <!--Columna derecha: Otras ciudades(Inicialmente vacio)-->
+    <div class="lg:col-span-1 bg-gray-700 rounded-2xl p-6 shadow-lg">
+      <h2 class="text-xl font-bold text-gray-200 mb-4">Otras Ciudades</h2>
+      <div id="other-cities-display" class="space-y-4">
+        <p class="text-gray-400 text-sm">Cargando otras ciudades...</p>
+        <!-- Aqui se mostraran las otras ciudades  -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>
