@@ -9,5 +9,8 @@ export default {
     extend: {},
   },
   plugins: [],
+   safelist: [
+    'capitalize', // Asegura que la utilidad 'capitalize' siempre se incluya
+  ],
 }
 
