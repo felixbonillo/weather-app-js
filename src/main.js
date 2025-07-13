@@ -95,9 +95,42 @@ async function fetchAndRenderWeather(city) {
 }
 
 
+//Nueva funcion para renderizar una tarjeta de pronostico de un dia
+function renderForecastDayCard(dayForecast) {
+  const card = document.createElement('div');
+  card.className = `flex flex-col items-center p-3 bg-gray-800 rounded-lg shadow-md`;
+  card.innerHTML = `
+    <p class="text-sm text-gray-300">${dayForecast.day}</p>
+    <p class="text-3xl my-1">${dayForecast.icon}</p>
+    <p class="text-sm text-gray-400">${dayForecast.description}</p>
+    <p class="text-xl font-bold text-blue-300">${dayForecast.temp}°</p>
+  `;
+  return card;
+
+}
+
+//Nueva funcion para generar y renderizar el pronostico de 5 dias con datos de ejemplos por ahora
+function fetchAndRenderFiveDayForecast(){
+  fiveDayForecastDisplay.innerHTML = '';
+
+  const dummyForecastData = [
+    { day: 'Hoy', icon: getWeatherIcon('01d'), description: 'Cielo claro', temp: 30 },
+    { day: 'Mañana', icon: getWeatherIcon('02d'), description: 'Pocas nubes', temp: 28 },
+    { day: 'Miercoles', icon: getWeatherIcon('03d'), description: 'Nublado', temp: 26 },
+    { day: 'Jueves', icon: getWeatherIcon('04d'), description: 'Lluvia ligera', temp: 25 },
+    { day: 'Viernes', icon: getWeatherIcon('09d'), description: 'Chubascos', temp: 24 },
+  ];
+  
+  dummyForecastData.forEach(day => {
+    const card = renderForecastDayCard(day);
+    fiveDayForecastDisplay.appendChild(card);
+  });
+}
+
 
 // --Inicializar la aplicacion--
 document.addEventListener('DOMContentLoaded', () => {
   fetchAndRenderWeather('Caracas'); // Cargar clima por defecto al iniciar
+  fetchAndRenderFiveDayForecast(); // Cargar pronostico de 5 dias por defecto al iniciar
 });
 
