@@ -42,30 +42,120 @@ function hideMessage() {
   messageArea.textContent = "";
 }
 
+// --- Funciones para generar iconos SVG (Estilo Ilustrativo/Apple-like) ---
+function getSunIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <circle cx="24" cy="24" r="10" fill="#FFD700"/>
+            <path d="M24 6V10M24 38V42M42 24H38M6 24H10M36.36 11.64L33.53 14.47M14.47 33.53L11.64 36.36M36.36 36.36L33.53 33.53M14.47 14.47L11.64 11.64" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="24" r="10" stroke="#FFA500" stroke-width="1.5"/>
+        </svg>
+    `;
+}
+
+function getCloudIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
+        </svg>
+    `;
+}
+
+function getCloudSunIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
+            <circle cx="34" cy="14" r="6" fill="#FFD700"/>
+            <path d="M34 8V10M34 18V20M40 14H38M30 14H28M38.24 10.24L36.82 11.66M31.18 16.82L29.76 18.24" stroke="#FFA500" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `;
+}
+
+function getRainIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
+            <path d="M18 34L16 40M24 34L22 40M30 34L28 40" stroke="#4169E1" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    `;
+}
+
+function getThunderstormIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
+            <path d="M24 20L18 32H28L22 44" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `;
+}
+
+function getSnowIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
+            <path d="M24 34V40M21 37H27M18 34L16 38M30 34L32 38M16 30L14 34M32 30L34 34" stroke="#ADD8E6" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    `;
+}
+
+function getMistIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
+            <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
+            <line x1="10" y1="36" x2="38" y2="36" stroke="#A9A9A9" stroke-width="2" stroke-linecap="round"/>
+            <line x1="8" y1="40" x2="36" y2="40" stroke="#A9A9A9" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    `;
+}
+
+// Icono de fallback para casos no mapeados o desconocidos
+function getDefaultIcon() {
+    return `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 md:w-6 md:h-6 text-gray-500">
+            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.53-2.28a.75.75 0 0 0-1.06-1.06L9 10.94l-1.72-1.72a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.06 0l3.75-3.75Z" clip-rule="evenodd" />
+        </svg>
+    `;
+}
+
+
+
 //Funcion para mapear codigos de clima a iconos
 
 function getWeatherIcon(iconCode) {
   switch (iconCode) {
     case "01d":
-      return "☀️"; // Clear sky
+    case "01n":
+      return getSunIcon();
     case "02d":
-      return "🌤️"; // Few clouds
+    case "02n":
+      return getCloudSunIcon();
     case "03d":
-      return "☁️"; // Scattered clouds
+    case "03n":
     case "04d":
-      return "☁️"; // Broken clouds
+    case "04n":
+      return getCloudIcon();
     case "09d":
-      return "🌧️"; // Shower rain
+    case "09n":
     case "10d":
-      return "🌦️"; // Rain
+    case "10n":
+      return getRainIcon(); // Rain
     case "11d":
-      return "⛈️"; // Thunderstorm
+    case "11n":
+      return getThunderstormIcon(); // Thunderstorm
     case "13d":
-      return "❄️"; // Snow
+    case "13n":
+      return getSnowIcon(); // Snow
     case "50d":
-      return "🌫️"; // Mist
+    case "50n":
+      return getMistIcon(); // Mist
     default:
-      return ""; // Unknown weather condition
+      return getDefaultIcon(); // Unknown weather condition
   }
 }
 
@@ -141,13 +231,33 @@ async function fetchAndRenderWeather(param) {
 //Nueva funcion para renderizar una tarjeta de pronostico de un dia
 function renderForecastDayCard(dayForecast) {
   const card = document.createElement("div");
-  card.className = `flex flex-col items-center p-3 bg-gray-800 rounded-lg shadow-md`;
-  card.innerHTML = `
-    <p class="text-sm text-gray-300">${dayForecast.day}</p>
-    <p class="text-3xl my-1">${dayForecast.icon}</p>
-    <p class="text-sm text-gray-400">${dayForecast.description}</p>
-    <p class="text-xl font-bold text-blue-300">${dayForecast.temp}°</p>
-  `;
+  card.className = `flex flex-col items-center p-6 bg-gray-800 rounded-lg shadow-md md:w-50`;
+
+  // Crear un elemento div temporal para parsear el SVG
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = dayForecast.icon;
+  const svgElement = tempDiv.firstElementChild; // Obtener el elemento SVG real
+
+  // Construir el resto del HTML de la tarjeta
+  const cardContent = `
+        <p class="text-sm text-gray-300">${dayForecast.day}</p>
+        <p class="text-sm text-gray-400 capitalize">${dayForecast.description}</p>
+        <p class="text-xl font-bold text-blue-300">${dayForecast.temp}°</p>
+    `;
+
+  // Asignar el contenido HTML a la tarjeta
+  card.innerHTML = cardContent;
+
+  // Insertar el elemento SVG parseado en la posición correcta
+  // Lo insertamos después del párrafo del día y antes de la descripción
+  const dayParagraph = card.querySelector("p:first-child");
+  if (dayParagraph) {
+    card.insertBefore(svgElement, dayParagraph.nextSibling);
+  } else {
+    // Fallback si por alguna razón no se encuentra el párrafo del día
+    card.prepend(svgElement); // Lo añade al principio de la tarjeta
+  }
+
   return card;
 }
 
@@ -194,9 +304,17 @@ async function fetchAndRenderFiveDayForecast(city = "Caracas") {
       //Aqui simplemente tomamos la primera entrada del dia o la mas cercana a una hora especifica
 
       if (!dailyForecast[day] || (hour >= 12 && hour <= 15)) {
+        const iconCode = item.weather[0].icon;
+        const svgIcon = getWeatherIcon(iconCode); //Obtener el SVG
+        console.log(
+          `procesando dia ${day}: iconCode=${iconCode}, SVG length=${
+            svgIcon.length > 0 ? "ok" : "empty"
+          }`
+        );
+
         dailyForecast[day] = {
           day: day,
-          icon: getWeatherIcon(item.weather[0].icon),
+          icon: svgIcon,
           description: item.weather[0].description,
           temp: Math.round(item.main.temp),
         };
