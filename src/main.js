@@ -70,23 +70,43 @@ function getWeatherIcon(iconCode) {
 }
 
 //Funcion principal para obtener y renderizar datos del clima
-async function fetchAndRenderWeather(city) {
+//Ahora acepta una ciudad (string) o latitud/longitud (objeto)
+
+async function fetchAndRenderWeather(param) {
   currentDisplay.innerHTML = `<p class="text-center text-gray-400">Cargando datos del clima...</p>`;
   hideMessage();
-  try {
-    //Peticion para el clima actual
-    const currentWeatherUrl = `${OPENWEATHER_BASE_URL}/weather?q=${encodeURIComponent(
-      city
-    )}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=es`;
-    console.log(`Fetching current weather from: ${currentWeatherUrl}`);
 
+  let currentWeatherUrl = "";
+  if (typeof param === "string") {
+    //Si el parametro es una ciudad (string)
+    currentWeatherUrl = `${OPENWEATHER_BASE_URL}/weather?q=${encodeURIComponent(
+      param
+    )}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=es`;
+  } else if (typeof param === "object" && param.lat && param.lon) {
+    //Si el parametro es un objeto con lat/lon
+    currentWeatherUrl = `${OPENWEATHER_BASE_URL}/weather?lat=${param.lat}&lon=${param.lon}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=es`;
+  } else {
+    showMessage("Parámetro de búsqueda de clima inválido.", "error");
+    currentDisplay.innerHTML =
+      '<p class="text-center text-red-400">Error: Parámetro de búsqueda inválido.</p>';
+    return;
+  }
+
+  console.log(`Fetching current weather from:  ${currentWeatherUrl}`);
+
+  try {
     const response = await fetch(currentWeatherUrl);
     if (!response.ok) {
       const errorData = await response.json();
+      if (response.status === 404) {
+        throw new Error(
+          `Ciudad no encontrada: ${
+            typeof param === "string" ? param : "ubicacion actual"
+          }. Por favor verifica el nombre`
+        );
+      }
       throw new Error(
-        `Error ${response.status}: ${
-          errorData.message || "Ciudad no encontrada"
-        }`
+        `Error ${response.status}: ${errorData.message || "Error desconocido"}`
       );
     }
     const data = await response.json();
@@ -208,6 +228,54 @@ async function fetchAndRenderFiveDayForecast(city = "Caracas") {
   }
 }
 
+//Nueva funcion : Obtener clima por geolocalizacion
+function getWeatherByGeolocation() {
+  showMessage("Detectando tu ubicacion...", "info");
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        console.log(`Ubicacion detectada: Lat ${lat}, Lon ${lon}`);
+
+        //Llamar ambas funciones con las coordenadas
+        await fetchAndRenderWeather({ lat, lon });
+        await fetchAndRenderFiveDayForecast({ lat, lon });
+      },
+      (error) => {
+        console.error("Error al obtener la ubicacion:", error);
+        let errorMessage = "No se pudo detectar tu ubicacion";
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage =
+            "Permiso de ubicacion denegado. Cargando clima por defecto";
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMessage =
+            "Informacion de ubicacion no disponible. Cargando clima por defecto (Caracas)";
+        } else if (error.code === error.TIMEOUT) {
+          errorMessage =
+            "Tiempo de espera agotado para obtener la ubicacion. Cargando la ciudad por defecto (Caracas)";
+        }
+        showMessage(errorMessage, "error");
+        //Cargar caracas como Fallback si falla la geolocalizacion
+        fetchAndRenderWeather("Caracas");
+        fetchAndRenderFiveDayForecast("Caracas");
+      },
+      {
+        enableHighAccuracy: true, //Intenta obtener la mejor precision posible
+        timeout: 10000, //10 segundos de tiempo de espera
+        maximumAge: 0, //No usar la posicion en cache, obtener una nueva
+      }
+    );
+  } else {
+    showMessage(
+      "Tu navegador no soporta la geolocalizacion. Cargando clima por defecto (Caracas)"
+    );
+    //Cargar Caracas como fallback si el navegador no soporta geolocalizacion
+    fetchAndRenderWeather("Caracas");
+    fetchAndRenderFiveDayForecast("Caracas");
+  }
+}
+
 // ---->Event listeners<-----
 //Evento para el buscador con debounce
 searchInput.addEventListener(
@@ -220,19 +288,17 @@ searchInput.addEventListener(
       //Modificacion clave aqui
       fetchAndRenderFiveDayForecast(city);
     } else {
-      // Manejar el caso en que no hay ciudad volvera a la ciudad por defecto
-      fetchAndRenderWeather("Caracas");
-      fetchAndRenderFiveDayForecast("caracas");
-      showMessage(
-        "Por favor, ingresa una ciudad para buscar el clima.",
-        "info"
-      );
+      //Si el input esta vacion intenta geolocalizacion o volver a Caracas por defecto
+      getWeatherByGeolocation();
     }
   }, 800)
 );
 
 // --Inicializar la aplicacion--
 document.addEventListener("DOMContentLoaded", () => {
-  fetchAndRenderWeather("Caracas"); // Cargar clima por defecto al iniciar
-  fetchAndRenderFiveDayForecast("caracas"); // Cargar pronostico de 5 dias por defecto al iniciar
+  // fetchAndRenderWeather("Caracas"); // Cargar clima por defecto al iniciar
+  // fetchAndRenderFiveDayForecast("caracas"); // Cargar pronostico de 5 dias por defecto al iniciar
+
+  //*** ->Ahora se inicia con la geolocalizacion<- ***
+  getWeatherByGeolocation();
 });
