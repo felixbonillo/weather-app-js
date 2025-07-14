@@ -131,47 +131,81 @@ function renderForecastDayCard(dayForecast) {
   return card;
 }
 
-//Nueva funcion para generar y renderizar el pronostico de 5 dias con datos de ejemplos por ahora
-function fetchAndRenderFiveDayForecast() {
-  fiveDayForecastDisplay.innerHTML = "";
+//Nueva funcion para generar y renderizar el pronostico de 5 dias con datos reales
+async function fetchAndRenderFiveDayForecast(city = "Caracas") {
+  console.log("--- fetchAndRenderFiveDayForecast INICIADO ---"); // Log de inicio
+  console.log("Ciudad recibida para pronóstico:", city); // Log de la ciudad
+  fiveDayForecastDisplay.innerHTML = `<p class="text-center text-gray-400 col-span-full">Cargando pronostico...</p>`;
 
-  const dummyForecastData = [
-    {
-      day: "Hoy",
-      icon: getWeatherIcon("01d"),
-      description: "Cielo claro",
-      temp: 30,
-    },
-    {
-      day: "Mañana",
-      icon: getWeatherIcon("02d"),
-      description: "Pocas nubes",
-      temp: 28,
-    },
-    {
-      day: "Miercoles",
-      icon: getWeatherIcon("03d"),
-      description: "Nublado",
-      temp: 26,
-    },
-    {
-      day: "Jueves",
-      icon: getWeatherIcon("04d"),
-      description: "Lluvia ligera",
-      temp: 25,
-    },
-    {
-      day: "Viernes",
-      icon: getWeatherIcon("09d"),
-      description: "Chubascos",
-      temp: 24,
-    },
-  ];
+  try {
+    const cityToUse = city ? city : "Caracas";
+    const forecastUrl = `${OPENWEATHER_BASE_URL}/forecast?q=${encodeURIComponent(
+      cityToUse
+    )}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=es`;
+    console.log(`Fetching 5-day forecast from: ${forecastUrl}`);
 
-  dummyForecastData.forEach((day) => {
-    const card = renderForecastDayCard(day);
-    fiveDayForecastDisplay.appendChild(card);
-  });
+    const response = await fetch(forecastUrl);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        `Error ${response.status}: ${errorData.message || "Error Desconocido"}`
+      );
+    }
+
+    const data = await response.json();
+    console.log("5-day forecast data:", data);
+
+    //Limpiar el contenedor del pronostico
+    fiveDayForecastDisplay.innerHTML = "";
+
+    //Procesar los datos para obtener un pronostico por dia (mediodia)
+    const dailyForecast = {};
+    data.list.forEach((item) => {
+      const date = new Date(item.dt * 1000); // Convertir a milisegundos para que se pueda usar Date
+      const day = date.toLocaleDateString("es-ES", {
+        weekday: "short",
+        day: "numeric",
+      }); //Da formato de dia corto y dia numerico ejemplo  "lun. 23"
+      const hour = date.getHours();
+
+      //Elegir una entrada representativa por dia //Ejemplo la mas cercana al mediodia
+      //Si ya tenemos un pronostico para ese dia, solo lo actualizamos si es mas relevante
+      //Aqui simplemente tomamos la primera entrada del dia o la mas cercana a una hora especifica
+
+      if (!dailyForecast[day] || (hour >= 12 && hour <= 15)) {
+        dailyForecast[day] = {
+          day: day,
+          icon: getWeatherIcon(item.weather[0].icon),
+          description: item.weather[0].description,
+          temp: Math.round(item.main.temp),
+        };
+      }
+    });
+    const sortedDays = Object.keys(dailyForecast).sort((a, b) => {
+      //Ordenacion por dia del mes
+      const dayA = parseInt(a.split(" ")[1]);
+      const dayB = parseInt(b.split(" ")[1]);
+      return dayA - dayB;
+    });
+    console.log("Dias ordenados para renderizar:", sortedDays);
+
+    //Renderizar las tarjetas del pronostico
+    if (sortedDays.length > 0) {
+      sortedDays.forEach((dayKey) => {
+        const card = renderForecastDayCard(dailyForecast[dayKey]);
+        fiveDayForecastDisplay.appendChild(card);
+      });
+    } else {
+      fiveDayForecastDisplay.innerHTML =
+        '<p class="text-center text-gray-400 col-span-full">No se pudo generar el pronóstico diario.</p>';
+    }
+  } catch (error) {
+    console.error("Error fetching 5-day forecast:", error);
+    fiveDayForecastDisplay.innerHTML =
+      '<p class= "text-center text-red-400 col-span-full"> No se pudo cargar el pronostico de 5 dias. </p>';
+    showMessage("Error al cargar el pronostico de 5 dias", "error");
+  }
 }
 
 // ---->Event listeners<-----
@@ -183,9 +217,12 @@ searchInput.addEventListener(
     if (city) {
       //Solo buscar si hay una ciudad
       fetchAndRenderWeather(city);
+      //Modificacion clave aqui
+      fetchAndRenderFiveDayForecast(city);
     } else {
       // Manejar el caso en que no hay ciudad volvera a la ciudad por defecto
       fetchAndRenderWeather("Caracas");
+      fetchAndRenderFiveDayForecast("caracas");
       showMessage(
         "Por favor, ingresa una ciudad para buscar el clima.",
         "info"
@@ -197,5 +234,5 @@ searchInput.addEventListener(
 // --Inicializar la aplicacion--
 document.addEventListener("DOMContentLoaded", () => {
   fetchAndRenderWeather("Caracas"); // Cargar clima por defecto al iniciar
-  fetchAndRenderFiveDayForecast(); // Cargar pronostico de 5 dias por defecto al iniciar
+  fetchAndRenderFiveDayForecast("caracas"); // Cargar pronostico de 5 dias por defecto al iniciar
 });
