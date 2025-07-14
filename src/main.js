@@ -13,6 +13,10 @@ const messageArea = document.getElementById("message-area");
 const OPENWEATHER_API_KEY = "641b3e58fcf3c44de818a76e7b7d2a5a";
 const OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5";
 
+//Lista de otras ciudades (Se cargara desde localStorage)
+let otherCities = [];
+const MAX_OTHER_CITIES = 5; //lIMITE DE CIUDAdes a guardar
+
 //Funcion para el buscador (Debounce)
 
 function debounce(func, delay) {
@@ -44,7 +48,7 @@ function hideMessage() {
 
 // --- Funciones para generar iconos SVG (Estilo Ilustrativo/Apple-like) ---
 function getSunIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <circle cx="24" cy="24" r="10" fill="#FFD700"/>
             <path d="M24 6V10M24 38V42M42 24H38M6 24H10M36.36 11.64L33.53 14.47M14.47 33.53L11.64 36.36M36.36 36.36L33.53 33.53M14.47 14.47L11.64 11.64" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -54,7 +58,7 @@ function getSunIcon() {
 }
 
 function getCloudIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
@@ -63,7 +67,7 @@ function getCloudIcon() {
 }
 
 function getCloudSunIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
@@ -74,7 +78,7 @@ function getCloudSunIcon() {
 }
 
 function getRainIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
@@ -84,7 +88,7 @@ function getRainIcon() {
 }
 
 function getThunderstormIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
@@ -94,7 +98,7 @@ function getThunderstormIcon() {
 }
 
 function getSnowIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
@@ -104,7 +108,7 @@ function getSnowIcon() {
 }
 
 function getMistIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" class="w-3 h-3 md:w-6 md:h-6">
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" fill="#B0C4DE"/>
             <path d="M38.5 20C38.5 14.4772 34.0228 10 28.5 10C24.4646 10 20.9126 12.3857 19.0069 15.727C17.0911 15.008 14.654 14.5 12 14.5C7.02944 14.5 3 18.5294 3 23.5C3 28.4706 7.02944 32.5 12 32.5H38.5C42.6421 32.5 46 29.1421 46 25C46 21.0294 42.9706 17.5 38.5 17.5" stroke="#778899" stroke-width="1.5"/>
@@ -116,14 +120,12 @@ function getMistIcon() {
 
 // Icono de fallback para casos no mapeados o desconocidos
 function getDefaultIcon() {
-    return `
+  return `
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 md:w-6 md:h-6 text-gray-500">
             <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.53-2.28a.75.75 0 0 0-1.06-1.06L9 10.94l-1.72-1.72a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.06 0l3.75-3.75Z" clip-rule="evenodd" />
         </svg>
     `;
 }
-
-
 
 //Funcion para mapear codigos de clima a iconos
 
@@ -158,6 +160,114 @@ function getWeatherIcon(iconCode) {
       return getDefaultIcon(); // Unknown weather condition
   }
 }
+
+
+// --- Funciones para manejar LocalStorage de ciudades ---
+function loadOtherCities() {
+    const storedCities = localStorage.getItem('otherCities');
+    if (storedCities) {
+        // Asegurarse de que solo se carguen las ciudades de la lista permitida
+        // Esto es útil si el formato de almacenamiento cambia o si hay datos corruptos
+        try {
+            const parsedCities = JSON.parse(storedCities);
+            if (Array.isArray(parsedCities)) {
+                otherCities = parsedCities.filter(city => typeof city === 'string').slice(0, MAX_OTHER_CITIES);
+            }
+        } catch (e) {
+            console.error("Error parsing otherCities from localStorage:", e);
+            otherCities = []; // Reset if parsing fails
+        }
+    }
+}
+
+function saveOtherCities() {
+    localStorage.setItem('otherCities', JSON.stringify(otherCities));
+}
+
+function addCityToOtherCities(cityName) {
+    // Normaliza el nombre de la ciudad para evitar duplicados, pero guarda el original
+    const normalizedCityName = cityName.toLowerCase().trim();
+    if (!otherCities.some(city => city.toLowerCase().trim() === normalizedCityName)) {
+        // Añade la ciudad al principio de la lista
+        otherCities.unshift(cityName);
+        // Limita el número de ciudades
+        if (otherCities.length > MAX_OTHER_CITIES) {
+            otherCities = otherCities.slice(0, MAX_OTHER_CITIES);
+        }
+        saveOtherCities(); // Guarda en localStorage
+        renderOtherCities(); // Vuelve a renderizar la lista
+    }
+}
+
+// Nueva función para obtener detalles del clima de una ciudad específica
+async function fetchCityWeatherDetails(cityName) {
+    const url = `${OPENWEATHER_BASE_URL}/weather?q=${encodeURIComponent(cityName)}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=es`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error ${response.status}: ${errorData.message || 'Error al obtener detalles de la ciudad'}`);
+        }
+        const data = await response.json();
+        return {
+            name: data.name,
+            country: data.sys.country,
+            temp: Math.round(data.main.temp),
+            description: data.weather[0].description,
+            icon: getWeatherIcon(data.weather[0].icon)
+        };
+    } catch (error) {
+        console.error(`Error al obtener detalles para ${cityName}:`, error);
+        return null; // Retorna null si hay un error
+    }
+}
+
+// Función para renderizar las otras ciudades como tarjetas
+async function renderOtherCities() {
+    otherCitiesDisplay.innerHTML = ''; // Limpia el contenedor
+
+    if (otherCities.length === 0) {
+        otherCitiesDisplay.innerHTML = '<p class="text-center text-gray-400 text-sm">No hay ciudades guardadas.</p>';
+        return;
+    }
+
+    // Usar Promise.all para cargar los detalles de todas las ciudades en paralelo
+    const cityDetailsPromises = otherCities.map(city => fetchCityWeatherDetails(city));
+    const allCityDetails = await Promise.all(cityDetailsPromises);
+
+    allCityDetails.forEach((details, index) => {
+        if (details) {
+            const cityCard = document.createElement('div');
+            cityCard.className = `
+                bg-gray-800 rounded-xl p-4 shadow-lg flex items-center justify-between
+                cursor-pointer hover:bg-gray-700 transition-colors duration-200
+            `;
+            cityCard.innerHTML = `
+                <div class="flex flex-col hover:bg-blue-800">
+                    <span class="text-xs text-gray-400">${details.country}</span>
+                    <span class="text-lg font-semibold text-gray-100">${details.name}</span>
+                    <span class="text-sm text-gray-300 capitalize">${details.description}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    ${details.icon}
+                    <span class="text-3xl font-bold text-blue-300">${details.temp}°</span>
+                </div>
+            `;
+            // Añadir evento de clic para cargar el clima de la ciudad al hacer clic en la tarjeta
+            cityCard.addEventListener('click', () => {
+                searchInput.value = details.name; // Pone la ciudad en el input de búsqueda
+                fetchAndRenderWeather(details.name);
+                fetchAndRenderFiveDayForecast(details.name);
+            });
+            otherCitiesDisplay.appendChild(cityCard);
+        } else {
+            // Si una ciudad no pudo cargar sus detalles, podríamos mostrar un mensaje o simplemente omitirla
+            console.warn(`No se pudieron cargar los detalles para la ciudad: ${otherCities[index]}`);
+        }
+    });
+}
+
+
 
 //Funcion principal para obtener y renderizar datos del clima
 //Ahora acepta una ciudad (string) o latitud/longitud (objeto)
@@ -221,6 +331,10 @@ async function fetchAndRenderWeather(param) {
     </div>
     `;
     hideMessage(); // Ocultar mensajes de carga si todo sale bien
+    // Añadir la ciudad a la lista de otras ciudades si es una busqueda por nombre
+    if (typeof param === "string") {
+      addCityToOtherCities(data.name);
+    }
   } catch (error) {
     console.error("Error fetching current weather:", error);
     currentDisplay.innerHTML = `<p class="text-center text-red-400">Error al cargar el clima actual: ${error.message}</p>`;
@@ -414,6 +528,8 @@ searchInput.addEventListener(
 
 // --Inicializar la aplicacion--
 document.addEventListener("DOMContentLoaded", () => {
+  loadOtherCities(); // Carga las ciudades guardadas al iniciar
+  renderOtherCities(); // Renderiza las ciudades cargadas
   // fetchAndRenderWeather("Caracas"); // Cargar clima por defecto al iniciar
   // fetchAndRenderFiveDayForecast("caracas"); // Cargar pronostico de 5 dias por defecto al iniciar
 
